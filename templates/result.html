@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{inputed}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.2/css/uikit.min.css" />
+</head>
+
+<body>
+
+    <div class="uk-flex uk-margin">
+        <div class="uk-margin-auto uk-width-1@m uk-card uk-card-default uk-card-body uk-background-primary">
+            <a href="http://127.0.0.1:5000/">
+                <p class="uk-text-left uk-text-large uk-text-bold" style="font-size:35px; color: white">
+                    MATTER SEARCH
+                </p>
+            </a>
+            <form action="http://127.0.0.1:5000/results" , method="POST">
+                <div uk-grid>
+                    <div class="uk-width-3-4@m">
+                        <input name="text" type="text" class="uk-input uk-card uk-card-default uk-card-hover" value="{{inputed}}">
+                    </div>
+                    <div class="uk-width-1-4@m uk-text-right">
+                        <button class="uk-button uk-button-primary uk-width-expand uk-input uk-card uk-card-primary uk-card-hover uk-background-default" style="color:black">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="uk-container" uk-height-viewport>
+        <p>About {{numberOfResults}} results ({{time}} seconds)</p>
+        <ul class="uk-list uk-list-large uk-list-divider">
+            {% for docID in answer %}
+            <li>
+                <a href="{{urlArray[docID|int]}}" style="font-size: 20px">
+                    {{titles[docID|int]}}
+                </a>
+                <br>
+                <span style="font-size: 15px;color: green">
+                    {{urlArray[docID|int]}}
+                </span>
+                <div style="font-size: 15px">
+                    <p>ตำแหน่งที่พบ</p>
+                    {% for position in answer[docID] %}
+                        {{position}}
+                    {%endfor%}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.2/js/uikit.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.2/js/uikit-icons.min.js"></script>
+</body>
+
+</html>
