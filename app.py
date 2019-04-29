@@ -12,11 +12,14 @@ import time
 
 app = fk.Flask(__name__)
 
+# nltk.download('punkt')
+
 invertedIndex = {}
 positionalIndex = {}
 urls = []
 titles = []
 tokenDocuments = []
+permutermIndex = {}
 
 
 def loadURLsFromFile():
@@ -64,6 +67,32 @@ def generatePositionalIndex():
                     if word == token:
                         positionalIndex[token][str(docID)].append(index)
 
+def createTextForms(text):
+  term = list(text + "$")
+  resultTerm = copy.copy(term)
+  results = [text + "$"]
+  for i in range(0, len(text)):
+      for j in range(len(term)-1, -1, -1):
+          if(j + 1 >= len(term)):
+              resultTerm[0] = term[j]
+          else:
+              resultTerm[j + 1] = term[j]
+      r = ""
+      for result in resultTerm:
+          r += result
+      results.append(r)
+      term = copy.copy(resultTerm)
+  return results
+
+def generatePermutermIndex():
+  global permutermIndex
+  for token in invertedIndex:
+    allForms = createTextForms(token)
+    # print(allForms)
+    for form in allForms:
+        permutermIndex[form] = token
+
+
 def getPriority(token):
   if (token == 'AND' or token == 'OR'):
     return 1
@@ -92,6 +121,17 @@ def intersectingMultiple(list):
   for i in range(1, len(list)):
     result = result.intersection(set(list[i]))
   return result
+
+def prefix_match(permutermIndex, prefix):
+    keyLists = []
+    for tk in permutermIndex.keys():
+        if tk.startswith(prefix):
+            keyLists.append(permutermIndex[tk])
+    return keyLists
+
+def bitwise_and(A,B):
+    return set(A).intersection(B)
+
 
 def booleanSearch(tokens):
   postFix = []
@@ -148,16 +188,23 @@ loadURLsFromFile()
 setupTokenDocuments()
 generateInvertedIndex()
 generatePositionalIndex()
+generatePermutermIndex()
 
-print("InvertedIndex")
-for key in invertedIndex:
-    print(key, invertedIndex[key])
-print("----------")
 
-print("PositionalIndex")
-for key in positionalIndex:
-    print(key, positionalIndex[key])
-print("----------")
+# print("InvertedIndex")
+# for key in invertedIndex:
+#     print(key, invertedIndex[key])
+# print("----------")
+
+# print("PositionalIndex")
+# for key in positionalIndex:
+#     print(key, positionalIndex[key])
+# print("----------")
+
+print("PermutermIndex")
+for key in permutermIndex.keys():
+  print(key)
+print("---------")
 
 def positionalIntersection(p1, p2, k, answer):
     docIDp1 = sorted(p1.keys())
@@ -207,6 +254,7 @@ def search():
             inputedWords = nltk.word_tokenize(inputedWords)
             inputedTokens = [word.lower() for word in inputedWords if word.isalpha()]
             inputedTokens = [r.encode('utf-8') for r in inputedTokens]
+            print(inputedTokens)
             if (len(inputedTokens) >= 2):
                 for i in range(1, len(inputedTokens)):
                     p1 = {}
@@ -239,6 +287,61 @@ def search():
             print(docIdAnswer)
             end = time.time()
             return fk.render_template('result.html', inputed = fk.request.form['text'], urls = urls, titles = titles, time = (end-start), algorithm = 'ProximitySearch', docIdAnswer = docIdAnswer, nbsAnswer = len(docIdAnswer))
+        elif ("*" in inputedWords):
+            start = time.time()
+            inputedWords = inputedWords.lower()
+            parts = inputedWords.split("*")
+            if len(parts) == 3:
+                case = 4
+            elif parts[1] == '':
+                case = 1
+            elif parts[0] == '':
+                case = 2
+            elif parts[0] != '' and parts[1] != '':
+                case = 3
+
+            if case == 4:
+                if parts[0] == '':
+                    case = 1
+
+            query = ""
+            queryA = ""
+            queryB = ""
+            if case == 1:
+                query = parts[0]
+            elif case == 2:
+                query = parts[1] + "$"
+            elif case == 3:
+                query = parts[1] + "$" + parts[0]
+            elif case == 4:
+                queryA = parts[2] + "$" + parts[0]
+                queryB = parts[1]
+            
+            results = []
+            if case == 4:
+                keyListsA = prefix_match(permutermIndex,queryA)
+                tmpA = []
+                for key in keyListsA:
+                  for docID in invertedIndex[key]:
+                    tmpA.append(docID)
+
+                keyListsB = prefix_match(permutermIndex,queryB)
+                tmpB = []
+                for key in keyListsB:
+                  for docID in invertedIndex[key]:
+                    tmpB.append(docID)
+                results = intersectingMultiple([tmpA, tmpB])
+                results = list(results)
+            else:
+                keyLists = prefix_match(permutermIndex,query)
+                for key in keyLists:
+                  for docID in invertedIndex[key]:
+                    results.append(docID)
+                results = set(results)
+                results = list(results)
+            end = time.time()
+            return fk.render_template('result.html', inputed = fk.request.form['text'], urls = urls, titles = titles, time = (end-start), algorithm = 'WildCardSearch', docIdAnswer = results, nbsAnswer = len(results))
+            
         else:
             start = time.time()
             inputedWords = nltk.word_tokenize(inputedWords)
