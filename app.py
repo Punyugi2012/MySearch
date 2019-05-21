@@ -30,7 +30,7 @@ def loadURLsFromFile():
 
 def setupTokenDocuments():
     global tokenDocuments
-    for index, url in enumerate(urls):
+    for url in urls:
         r = requests.get(url)
         c = r.content
         soup = BeautifulSoup(c, 'html.parser')
@@ -41,8 +41,7 @@ def setupTokenDocuments():
         words = ""
         tokens = []
         for p in pElements:
-            if p.string != None:
-                words += p.string + " "
+          words += p.getText() + " "
         words = nltk.word_tokenize(words)
         tokens = [word.lower() for word in words if word.isalpha()]
         tokens = [r.encode('utf-8') for r in tokens]
