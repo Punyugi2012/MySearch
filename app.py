@@ -88,7 +88,6 @@ def generatePermutermIndex():
   global permutermIndex
   for token in invertedIndex:
     allForms = createTextForms(token)
-    # print(allForms)
     for form in allForms:
         permutermIndex[form] = token
 
@@ -201,10 +200,10 @@ generatePermutermIndex()
 #     print(key, positionalIndex[key])
 # print("----------")
 
-print("PermutermIndex")
-for key in permutermIndex.keys():
-  print(key)
-print("---------")
+# print("PermutermIndex")
+# for key in permutermIndex.keys():
+#   print(key)
+# print("---------")
 
 def positionalIntersection(p1, p2, k, answer):
     docIDp1 = sorted(p1.keys())
@@ -246,6 +245,7 @@ def init():
 @app.route('/results', methods=['POST'])
 def search():
     inputedWords = fk.request.form['text']
+    inputedWords = str(inputedWords)
     if len(inputedWords) > 0:
         if inputedWords.startswith('"') and inputedWords.endswith('"'):
             start = time.time()
