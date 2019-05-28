@@ -3,3 +3,5 @@ requests
 bs4
 pandas
 nltk
+nginx
+gunicorn
