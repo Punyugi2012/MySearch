@@ -1,7 +1,6 @@
 import flask as fk
 import requests
 import re
-from lxml import html
 from bs4 import BeautifulSoup
 import pandas as pd
 import nltk
@@ -12,7 +11,7 @@ import time
 
 app = fk.Flask(__name__)
 
-# nltk.download('punkt')
+nltk.download('punkt')
 
 invertedIndex = {}
 positionalIndex = {}
