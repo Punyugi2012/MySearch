@@ -238,11 +238,13 @@ def positionalIntersection(p1, p2, k, answer):
 
 @app.route('/')    
 def init():
-    return fk.render_template('index.html')
+    host_url = fk.request.host_url
+    return fk.render_template('index.html', host_url=host_url)
 
 @app.route('/results', methods=['POST'])
 def search():
     inputedWords = fk.request.form['text']
+    host_url = fk.request.host_url
     inputedWords = str(inputedWords)
     if len(inputedWords) > 0:
         if inputedWords.startswith('"') and inputedWords.endswith('"'):
@@ -284,7 +286,7 @@ def search():
             docIdAnswer = sorted(docIdAnswer)
             print(docIdAnswer)
             end = time.time()
-            return fk.render_template('result.html', inputed = fk.request.form['text'], urls = urls, titles = titles, time = (end-start), algorithm = 'ProximitySearch', docIdAnswer = docIdAnswer, nbsAnswer = len(docIdAnswer))
+            return fk.render_template('result.html', inputed = fk.request.form['text'], urls = urls, titles = titles, time = (end-start), algorithm = 'ProximitySearch', docIdAnswer = docIdAnswer, nbsAnswer = len(docIdAnswer), host_url=host_url)
         elif ("*" in inputedWords):
             start = time.time()
             inputedWords = inputedWords.lower()
@@ -338,7 +340,7 @@ def search():
                 results = set(results)
                 results = list(results)
             end = time.time()
-            return fk.render_template('result.html', inputed = fk.request.form['text'], urls = urls, titles = titles, time = (end-start), algorithm = 'WildCardSearch', docIdAnswer = results, nbsAnswer = len(results))
+            return fk.render_template('result.html', inputed = fk.request.form['text'], urls = urls, titles = titles, time = (end-start), algorithm = 'WildCardSearch', docIdAnswer = results, nbsAnswer = len(results), host_url=host_url)
             
         else:
             start = time.time()
@@ -355,7 +357,7 @@ def search():
             docIdAnswer = sorted(docIdAnswer)
             print(docIdAnswer)
             end = time.time()
-            return fk.render_template('result.html', inputed = fk.request.form['text'], urls = urls, titles = titles, time = (end-start), algorithm = 'BooleanSearch', docIdAnswer = docIdAnswer, nbsAnswer = len(docIdAnswer))
+            return fk.render_template('result.html', inputed = fk.request.form['text'], urls = urls, titles = titles, time = (end-start), algorithm = 'BooleanSearch', docIdAnswer = docIdAnswer, nbsAnswer = len(docIdAnswer), host_url=host_url)
     else:
         return 'Input Invalid'
 if __name__ == "__main__":

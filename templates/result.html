@@ -13,12 +13,12 @@
 
     <div class="uk-flex uk-margin">
         <div class="uk-margin-auto uk-width-1@m uk-card uk-card-default uk-card-body uk-background-primary">
-            <a href="http://127.0.0.1:5000/">
+            <a href="{{host_url}}">
                 <p class="uk-text-left uk-text-large uk-text-bold" style="font-size:35px; color: white">
                     MATTER SEARCH
                 </p>
             </a>
-            <form action="http://127.0.0.1:5000/results" , method="POST">
+            <form action="{{host_url + 'results'}}" , method="POST">
                 <div uk-grid>
                     <div class="uk-width-3-4@m">
                         <input name="text" type="text" class="uk-input uk-card uk-card-default uk-card-hover" value="{{inputed}}" autocomplete="off">
