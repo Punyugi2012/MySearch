@@ -358,5 +358,5 @@ def search():
             return fk.render_template('result.html', inputed = fk.request.form['text'], urls = urls, titles = titles, time = (end-start), algorithm = 'BooleanSearch', docIdAnswer = docIdAnswer, nbsAnswer = len(docIdAnswer))
     else:
         return 'Input Invalid'
-
-app.run(host="0.0.0.0", port=80)
+if __name__ == "__main__":
+  app.run(host="0.0.0.0", port=80)
