@@ -359,3 +359,4 @@ def search():
     else:
         return 'Input Invalid'
 
+app.run(host="0.0.0.0", port=80)
